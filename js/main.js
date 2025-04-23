@@ -111,44 +111,39 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   
-    /**
-     * Contact form submission
-     */
-    const contactForm = document.querySelector('.contact-form');
-    if (contactForm) {
-      contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const submitButton = this.querySelector('button[type="submit"]');
-        
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Sending...';
-        
-        fetch(this.action, {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => {
-          if (response.ok) {
-            alert('Your message has been sent. Thank you!');
-            this.reset();
-          } else {
-            throw new Error('Network response was not ok');
-          }
-        })
-        .catch(error => {
-          alert('There was a problem sending your message. Please try again later.');
-          console.error('Error:', error);
-        })
-        .finally(() => {
-          submitButton.disabled = false;
-          submitButton.innerHTML = 'Send Message';
-        });
-      });
+    // Contact form handling
+document.querySelector('.contact-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  try {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+    
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      alert('Thank you! Your message has been sent successfully.');
+      form.reset();
+    } else {
+      throw new Error('Form submission failed');
     }
-  });
-
+  } catch (error) {
+    alert('There was a problem sending your message. Please try again later.');
+    console.error('Error:', error);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+});
   // Add this to your existing JavaScript file
 if (document.querySelector('.work-process')) {
     // Animate steps on scroll
